@@ -89,15 +89,15 @@ Your choice:"
 		fi
 		read -r key
 		if [ "$key" = "yes" ]||[ "$key" = "y" ]; then
-			read -p -r "Set your domain for google search: " search_domain
-			read -p -r "Set your domain for google scholar: " scholar_domain
+			read -p "Set your domain for google search: " search_domain
+			read -p "Set your domain for google scholar: " scholar_domain
 			if [ ! $search_domain ]||[ ! $scholar_domain ]||[ $search_domain = $scholar_domain ]; then
 				echo "Two domains should not be null OR the same! Error happens!"
 				exit 1
 			else
 				echo "your google search domain is $search_domain"
 				echo "your google scholar domain is $scholar_domain"
-				read -p -r "Press any key to continue ... " goodmood
+				read -p "Press any key to continue ... " goodmood
 			fi
 		else
 			exit 1
@@ -134,10 +134,10 @@ function update {
 	rootness
 #2.Configure
 	source "$HOME/nginx_onekey_config"
-	read -p -r "Do you need to change your domain for google and schoolar?(y/N):" change
+	read -p "Do you need to change your domain for google and schoolar?(y/N):" change
 	if [ "$change" = "y" ] || [ "$change" = "Y" ]; then
-		read -p -r "Set your domain for google search: " search_domain
-		read -p -r "Set your domain for google scholar: " scholar_domain
+		read -p "Set your domain for google search: " search_domain
+		read -p "Set your domain for google scholar: " scholar_domain
 		cat >> "$HOME/nginx_onekey_config" << EOF
 search_domain=$search_domain
 scholar_domain=$scholar_domain
