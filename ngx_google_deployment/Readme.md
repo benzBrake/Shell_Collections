@@ -40,6 +40,7 @@ such as:
 
 ## How to change default config
 * ./ngx_google_deployment.sh configure
+
 # Depend on Projects
 * [Nginx](http://nginx.org/)
 * [ngx_http_substitutions_filter_module](https://github.com/yaoweibin/ngx_http_substitutions_filter_module)
