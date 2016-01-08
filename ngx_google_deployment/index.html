@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Be Smart</title>
+  <meta name="renderer" content="webkit" />
+  <meta name="referrer" content="always" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta http-equiv="Cache-Control" content="max-age=3600, must-revalidate" />
+  <link rel="shortcut icon" type="image/x-icon" href="./assets/favicon.ico" />
+  <!--[if lt IE 9]>
+	<script src="./assets/ltie9.js"></script>
+  <![endif]-->
+  <style type="text/css">*{margin:0;padding:0}html{_height:100%}body{color:#333;font-size:13px;font-family:Microsoft YaHei,微软雅黑,Verdana,sans-serif,宋体;line-height:1.42857 _height:100%;background:#f2f2f2}h1{margin:65px 0 20px;color:#444;font-size:7em}h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6{color:inherit;font-weight:500;font-family:inherit;line-height:1.1}#nav{padding-left:10px;height:32px;background-color:#000}#nav ul{margin:0;list-style:none}#nav .navbar-left{float:left}#nav .navbar-right{float:right!important;margin-right:10px}#nav ul li{display:inline;line-height:32px}#nav a{color:#fff;text-decoration:none}#nav a#mobile-menu{float:left;display:none;margin:4px;width:24px;height:24px;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAMElEQVRIx2P8//8/Ay0BCwONAV0toHZYMQ6/IGIcTUWjyXQ0mY4m09FkOppMh6wFAK8/Bl5I8K1LAAAAAElFTkSuQmCC")}#nav ul li a::before{visibility:hidden;margin-right:1px;content:'>'}#nav ul li a::after{visibility:hidden;margin-right:1px;content:'<'}#nav ul li a.current,#nav ul li a:hover,#nav ul li a:hover::after,#nav ul li a:hover::before{visibility:visible;color:#39f}#main-container{margin:auto;width:35%;max-width:600px}.input-group{padding:0;width:100%;border:1px solid;border-radius:5px;background-color:#fff;*margin-bottom:10px}.input-group+.input-group{margin-top:10px}.input-group input{margin:0;padding:0;border-width:0;font-size:14px}.input-group .form-control{padding:8px 5px;width:calc(100% - 100px - 5px * 2);width:-moz-calc(100% - 100px - 5px * 2);width:-webkit-calc(100% - 100px - 5px * 2);width:-o-calc(100% - 100px - 5px * 2);border-radius:4px 0 0 4px;*float:left}.input-group .form-control:focus{background-color:#eee}input.btn{float:right;padding:7px 5px;-webkit-padding-before:8px;-webkit-padding-after:8px;width:100px;border-radius:0 4px 4px 0;background:#4285f4 none repeat scroll 0 0;color:#FFF;border:1px #4285f4;cursor:pointer}#footer{position:absolute;padding:0 10px;left:0;bottom:0;right:0;background:#f2f2f2 none repeat scroll 0 0;border-top:1px solid #e4e4e4;line-height:40px;font-size:small;color:#666;_height:32px}.domain::before{content:"@";font-style:normal}.heheda{display:block!important}@media screen and (min-width:721px) and (max-width:1280px){#main-container{width:60%}}@media screen and (min-width:481px) and (max-width:720px){#main-container{width:80%}#vertical-container{margin:15% auto}}@media screen and (max-width:480px){#nav ul#top-nav{position:absolute;top:32px;padding:0;width:calc(100% - 16px);background-color:#000;display:none;transition:height ease .2s}#nav ul#top-nav li{display:block}#nav a#mobile-menu{display:block}#main-container{width:95%}#main-container h1{font-size:3.5em}}</style>
+  <script type="text/javascript">
+			var t1 = new Date().getTime();
+		</script>
+ </head>
+ <body>
+  <div id="header" class="clearfix">
+     <div id="nav" class="navbar">
+       <a id="mobile-menu" onclick="mobileMenu();"></a>
+       <ul class="nav navbar-nav navbar-left" id="top-nav">
+        <li><a title="首页" class="current" href="https://x.doufu.ru/">Search</a></li>
+        <li><a title="地图" href="http://www.google.cn/maps" target="_blank">Maps</a></li>
+        <li><a title="翻译" href="http://translate.google.cn/" target="_blank">Translate</a></li>
+        <li><a title="浏览器" href="http://www.google.cn/chrome/browser/desktop/index.html" target="_blank">Chrome</a></li>
+       </ul>
+       <ul class="nav navbar-nav navbar-right">
+		<li><a href="https://g.doufu.ru/?hl=zh_CN">中文</a></li>
+        <li><a target="_blank" href="http://www.32mb.cn/">32MB.CN</a></li>
+       </ul>
+     </div>
+  </div>
+  <div id="body">
+  <div id="vertical-container" class="container">
+  <div id="main-container" class="container">
+   <center>
+    <h1>Be Smart</h1>
+   </center>
+	 <!-- Test On https://jsfiddle.net/uq2js0o4/2/ -->
+	 <div class="input-group">
+     <input  name="google" id="google" type="text" style="box-shadow:none; " class="form-control" />
+     <input class="btn" id="search-btn" type="button" value=" &nbsp; Google &nbsp; " onclick="search1();" />
+</div>
+<div class="input-group">
+     <input name="scholar" id="scholar" type="text" style="box-shadow:none; " class="form-control" />
+     <input class="btn" id="search-btn" type="button" value=" &nbsp; Scholar &nbsp; " onclick="search2();" />
+</div>
+<div class="input-group">
+     <input name="panbaidu" id="panbaidu" type="text" style="box-shadow:none; " class="form-control" />
+     <input class="btn" id="search-btn" type="button" value=" &nbsp; Pan.baidu &nbsp; " onclick="search3();" />
+</div>
+<div class="input-group">
+     <input name="zhihu" id="zhihu" type="text" style="box-shadow:none; " class="form-control" />
+     <input class="btn" id="search-btn" type="button" value=" &nbsp; Zhihu &nbsp; " onclick="search3();" />
+</div>
+<div class="input-group" style="border: medium none;">
+       	<center>
+       	<div id="word" style="width:100%; float:left;font-size:15px">
+					<div id="jsword"></div>
+					<div id="TimeShow"></div>
+			 	</div>
+			 	</center>
+			 </div>
+</div>
+<div id="footer">
+   <span style="*float:left"><a href="https://www.32mb.cn/" target="_blank">Powered by 长者</a></span>
+   <span style="float:right">search<i class="domain"></i>32mb.cn</span>
+  </div>
+  <div style="display:none"><script src="http://s95.cnzz.com/z_stat.php?id=1256858423&web_id=1256858423" language="JavaScript"></script></div>
+  </div>
+   <script>
+function hasClass(obj, cls) {return obj.className.match(new RegExp('(\\s|^)' + cls + '(\\s|$)'));}
+function addClass(obj, cls) {if (!this.hasClass(obj, cls)) obj.className += " " + cls;}
+function removeClass(obj, cls) {
+	if (hasClass(obj, cls)) {
+		var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');
+		obj.className = obj.className.replace(reg, ' ');
+	}
+}
+function toggleClass(obj,cls){if(hasClass(obj,cls)){removeClass(obj, cls);}else{addClass(obj, cls);}}
+function mobileMenu() {
+	var tn = document.getElementById("top-nav");
+    toggleClass(tn,"heheda");
+}
+//define for all browsers
+function goto(url){
+
+	if (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || /MSIE(\d+\.\d+);/.test(navigator.userAgent)){
+		var referLink = document.createElement('a');
+		referLink.href = url;
+		document.body.appendChild(referLink);
+		referLink.click();
+	} else {
+		location.href = url;
+	}
+}
+if (top.location != self.location) {
+    top.location = self.location;
+}
+function search1(){
+	var keyword1=document.getElementById("google");
+	if(keyword1.value==''||keyword1.value==null||keyword1.value== undefined){
+
+	}
+	else {
+		goto("https://g.doufu.ru/search?newwindow=1&safe=off&hl=en-US&q="+encodeURIComponent(keyword1.value))+"&gws_rd=ssl&cad=h";
+	}
+}
+function search2(){
+	var keyword2=document.getElementById("scholar");
+	goto("https://x.doufu.ru/scholar?hl=zh-CN&q="+encodeURIComponent(keyword2.value)+"&btnG=&lr=");
+}
+function search3(){
+	var keyword3=document.getElementById("panbaidu");
+	goto("https://g.doufu.ru/search?newwindow=1&safe=off&q=site:pan.baidu.com+"+encodeURIComponent(keyword3.value)+"&btnG=&lr=");
+}
+function search4(){
+	var keyword4=document.getElementById("zhihu");
+	goto("https://g.doufu.ru/search?newwindow=1&safe=off&q=site:zhihu.com+"+encodeURIComponent(keyword4.value)+"&btnG=&lr=");
+}
+document.onkeydown=function(e) {
+	e=e||event;var key=e.keyCode||e.charCode;
+	if(key==13){
+		var curId=event.srcElement.id;
+		switch(curId){
+		case"google": search1();
+		break;
+		case"scholar": search2();
+		break;
+		case"panbaidu": search3();
+		break;
+		case"zhihu": search4();
+		break;
+		default: search1();
+		}
+	}
+	
+};
+var dictumin=new Array("不要总想着搞个大新闻！","TOO SIMPLE（太简单），SOMETIMES NAIVE（有时幼稚）","北上广不相信眼泪，黑吉辽不相信喝醉，江浙沪不相信邮费，湘渝川不相信原味，粤港澳不相信捞妹，蒙藏回不相信派对。","你们给我搞得这个呀……excited！","我爱的人，不是我的爱人，她心里的每一寸，都属于那个有钱人。","其实喜欢钱的女孩真不多，大部分女孩在意的还是男人能不能真心对她好。——某土豪","说实在的，我觉得民主主义什么的没了也好，整个宇宙还原成原子也无所谓，只要他能在我身旁半醒半睡地看书就好了……——菲列特利加·格林希尔","上位，没有捷径可走，只有脚踏实地送礼。","良好的秩序是一切的基础。——伯克  ","倘若世上没有坏人,也就不会有好的律师。——狄更斯","自然界中没有奖赏和惩罚,只有因果报应。——瓦谢尔","与其责骂罪恶,不如伸张正义。——丁尼生 ","像水一样清澈，像风一样自由。",'曾经感觉中的成年人，那是超脱的神佛，是不存在的，成人世界，"孔子双也"。',"小时候觉得成年人能包容一切，眼前的成人世界也不过如此，大人比着小孩多的是隐藏的心计和更大的欲望。","自己没努力，整天讲别人别人怎么样，羡慕，有什么用呢。","己所不欲，勿施于人。","一个人有了妻子儿女，就是把自己抵押给了命运；因为家庭妨碍他建功立业，无论这功业有益于人还是有害于人。","法律不能使人人平等，但在法律面前人人平等。","活在当下，需要担当。","简单，仔细，清白，如果再和善一点、努力一点，也挺好。","总觉得别人不关心你，你又何尝关心过别人？(鬼宿舍)","不再虚妄，潜力，证明。","人生自是有情痴，此恨不关风和月。","心态不稳，气血上涌，无法平静。","说话简明扼要就好，不需要繁琐的解释。","记住的不可能忘记，只会暂时还想不起来而已。","天生道，可行，不可乱。","如果你注定要失去所有，那么你还会愿意得到吗？有些东西，重要的还是过程，比如人生。","花开堪折直须折，莫待无花空折枝。","蓄精养锐，绝处逢生。","如果你没有把握确定一件事情，那么你可以继续求证，但你对待它的行为应该一如既往，不应该有质疑的成分。","就算世界再潮流，我还有我追求。","你活的太严肃，呆板的脸似乎对生存已经麻木。","去吹风、看星星，天晴下雨，一个人高兴。","就算世界再荒芜，也有一个人是你的信徒。","女人没魅力才会说男人花心，男人没实力才会说女人现实。","枪有很多把，不符合规则的人已经得到了一把，而他的目标是你们这些手无寸铁的人，你是愿意拿起枪反抗、并保护你挚爱的同伴呢，还是甘愿做一只沉默的羔羊？","有一种崩溃叫做密码输入错误，有一种惊慌叫账号异地登录，有一种感情叫隐身对其可见，有一种失落叫你没访问权限。","太自我、太自私的人有了文化，是社会的灾难；有慈善的想法，却不能有实际行为的人，却又是社会的悲哀。","全世界哪里能作死你们跑得比谁都快，可是作个大死呢？ naive！","在乎就会有所顾及，若所有人都不在乎了，那么就会没有顾及，也就会生出太多事端。","既是为了消除一个遗憾而来，又怎能带着遗憾而去？","天既是道，道既是规则，顺道则生，逆道则亡。","穷则独善其身，达则兼济天下。","一直以为只要不干扰别人就行了，其实无意的诱使别人沦落也是一种罪过。","想的太多，错的太多，想的太多，想不到的也有太多。","真正的爱情可以伟大到在生死关头都不离不弃，但是有一样东西却可以瞬间将其摧毁，你知道是什么吗？是背叛，背叛一旦产生，破碎的爱情之镜就无法再复原。","这世间有种表面上看似做了坏事的人，实质上他的善意只有明智的人才知道，真正的好人起初不为人知，甚至永远不为人知，还被人唾弃。","生前何必久睡，死后自会长眠。");
+function dowritedicta(num){var randid=Math.round(Math.random()*num);randid=randid>=num?num-1:randid;return dictumin[randid];}
+document.getElementById("jsword").innerHTML=dowritedicta(dictumin.length)
+window.onload=function(){document.getElementById("google").focus()
+document.getElementById("TimeShow").innerHTML="&nbsp;(Consume&nbsp;"+(new Date().getTime()-t1)+"&nbsp;ms)";};
+ </script>
+ </body>
+
+</html>
