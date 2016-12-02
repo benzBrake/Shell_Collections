@@ -34,11 +34,11 @@ install(){
 	if [ "$OS" = "CentOS" ]; then
 		LOGPATH="/var/log/secure"
 		centos_install
-		
+
 	elif [ "$OS" = "Debian" ]; then
 		LOGPATH="/var/log/auth.log"
 		debian_install
-		
+
 	else
 		LOGPATH="/var/log/auth.log"
 		ubuntu_install
@@ -76,6 +76,7 @@ centos_install(){
 	fi
 }
 debian_install(){
+	apt-get -y update
 	apt-get -y install fail2ban
 	write_conf
 	service fail2ban restart
@@ -85,19 +86,20 @@ ubuntu_install(){
 	debian_install
 }
 unban(){
-	echo unban
+	fail2ban-client set ssh-iptables unbanip $1
 }
 show_log(){
 	linux_check
+	echo "Line UserName IP"
 	if [ "$OS" = "CentOS" ]; then
-		cat /var/log/secure* | grep 'Failed password' | awk '{ print $9"\t"$11; }'
+		cat /var/log/secure* | grep 'Failed password' | awk 'BEGIN{sum=0;}{sum ++;if ($9 == "invalid") { print $11 "\t" $13 } else { print $9 "\t" $11; }}END{ print "SUM:" sum}' 
 	else
-		cat /var/log/auth.log | grep 'Failed password' | awk '{ print $9"\t"$11; }'
+		cat /var/log/auth.log | grep 'Failed password' | awk 'BEGIN{sum=0;}{sum ++;if ($9 == "invalid") { print $11 "\t" $13 } else { print $9 "\t" $11; }}END{ print "SUM:" sum}' 
 	fi
 }
 uninstall() {
 	linux_check
-	if [ "$OS" = "CentOS" ]; then	
+	if [ "$OS" = "CentOS" ]; then
 		yum -y remove fail2ban
 	else
 		apt-get -y remove fail2ban
@@ -111,15 +113,19 @@ function root_check {
 		exit 1
 	fi
 }
-root_check
+#root_check
 case $1 in
 	h|H|help)
 		echo "Usage: $0 [OPTION]"
 		echo ""
 		echo "Here are the options:"
-		echo "install       install fail2ban"
-		echo "uninstall     uninstall fail2ban"
-		echo "showlog       show failed login logs";;
+		echo "install		install fail2ban"
+		echo "uninstall	uninstall fail2ban"
+		echo "showlog		show failed login logs"
+		echo "unban <ip>		unban ip";;
+	unban)
+		unban $2
+		;;
 	showlog)
 		show_log;;
 	install)
