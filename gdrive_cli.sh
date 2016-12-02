@@ -5,7 +5,7 @@
 # Date: 2016-12-02
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-if [ -f ~/bin/gdrive ]
+if [ -f ~/bin/gdrive ]; then
 	exit 0
 else
 	MACHINE_TYPE=`uname -m`
