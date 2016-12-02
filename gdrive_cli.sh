@@ -16,6 +16,6 @@ else
 	fi
 	DOWNLOAD_URL=`wget -O- https://github.com/prasmussen/gdrive  2>/dev/null | grep "<a.*gdrive-linux-${MACHINE_TYPE}" | sed 's/.*href="//' | sed 's/&amp.*//'`
 	mkdir -p ~/bin
-	wget $DOWNLOAD_URL -O ~/bin/gdrive
+	wget ${DOWNLOAD_URL} -O ~/bin/gdrive
 	chmod +x ~/bin/gdrive
 fi
