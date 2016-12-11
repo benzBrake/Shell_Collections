@@ -44,6 +44,9 @@ install(){
 		ubuntu_install
 	fi
 	unset LOGPATH
+	mkdir -p ~/bin
+	wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban.sh -O ~/bin/fail2ban.sh
+	chmod +x ~/bin/fail2ban.sh
 }
 write_conf(){
 rm /etc/fail2ban/jail.conf -rf
