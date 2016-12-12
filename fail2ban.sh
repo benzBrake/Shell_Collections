@@ -33,14 +33,17 @@ install(){
 	linux_check
 	if [ "$OS" = "CentOS" ]; then
 		LOGPATH="/var/log/secure"
+		CONFPATH="/etc/fail2ban/jail.conf"
 		centos_install
 
 	elif [ "$OS" = "Debian" ]; then
 		LOGPATH="/var/log/auth.log"
+		CONFPATH="/etc/fail2ban/jail.local"
 		debian_install
 
 	else
 		LOGPATH="/var/log/auth.log"
+		CONFPATH="/etc/fail2ban/jail.local"
 		ubuntu_install
 	fi
 	unset LOGPATH
@@ -49,8 +52,8 @@ install(){
 	chmod +x ~/bin/fail2ban.sh
 }
 write_conf(){
-rm /etc/fail2ban/jail.conf -rf
-cat > /etc/fail2ban/jail.conf <<EOF
+rm $CONFPATH -rf
+cat > $CONFPATH <<EOF
 [DEFAULT]
 ignoreip = 127.0.0.1/8
 bantime = 86400
@@ -79,6 +82,15 @@ centos_install(){
 	fi
 }
 debian_install(){
+    if [ OS_VSRSION -lt 7 ]; then
+        echo 'Acquire::Check-Valid-Until "false";' >/etc/apt/apt.conf.d/90ignore-release-date
+        echo "deb http://archive.debian.org/debian-archive/debian squeeze main" > /etc/apt/sources.list
+        echo "deb http://archive.debian.org/debian-archive/debian squeeze-proposed-updates main" >> /etc/apt/sources.list
+        echo "deb http://security.debian.org squeeze/updates main" >> /etc/apt/sources.list
+        echo "deb http://archive.debian.org/debian-archive/debian squeeze-lts main contrib non-free" >> /etc/apt/sources.list
+        #install gpg key
+        apt-get -y install debian-archive-keyring
+    fi
 	apt-get -y update
 	apt-get -y install fail2ban
 	write_conf
@@ -86,7 +98,11 @@ debian_install(){
 	update-rc.d fail2ban enable
 }
 ubuntu_install(){
-	debian_install
+	apt-get -y update
+	apt-get -y install fail2ban
+	write_conf
+	service fail2ban restart
+	update-rc.d fail2ban enable
 }
 unban(){
 	fail2ban-client set ssh-iptables unbanip "$1"
@@ -109,6 +125,7 @@ uninstall() {
 	fi
 	rm /etc/fail2ban/ -rf
 	rm /var/run/fail2ban/ -rf
+	rm ~/bin/fail2ban.sh -rf
 }
 root_check() {
 	if [ $(id -u) -ne 0 ]; then
