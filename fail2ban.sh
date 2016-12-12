@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/sh
 #
 # Onekey install script for fail2ban
 # Author: Char1sma
@@ -6,7 +6,7 @@
 MIN_CENTOS_VER=5
 MIN_DEBIAN_VER=6
 MIN_UBUNTU_VER=12
-SSH_PORT=`netstat -ntlp|grep sshd |awk -F: '{if($4!="")print $4}' | head -n 1 | sed 's/ //'`
+SSH_PORT=$(netstat -ntlp|grep sshd |awk -F: '{if($4!="")print $4}' | head -n 1 | sed 's/ //')
 HOSTNAME=$(hostname)
 linux_check(){
 	if $(grep -qi "CentOS" /etc/issue) || $(grep -q "CentOS" /etc/*-release); then
@@ -44,6 +44,9 @@ install(){
 		ubuntu_install
 	fi
 	unset LOGPATH
+	mkdir -p ~/bin
+	wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban.sh -O ~/bin/fail2ban.sh
+	chmod +x ~/bin/fail2ban.sh
 }
 write_conf(){
 rm /etc/fail2ban/jail.conf -rf
@@ -64,10 +67,10 @@ maxretry = 3
 EOF
 }
 centos_install(){
-	rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_VSRSION}.noarch.rpm
+	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$OS_VSRSION.noarch.rpm"
 	yum -y install fail2ban
 	write_conf
-	if [ $OS_VSRSION -gt 6 ]; then
+	if [ "$OS_VSRSION" -gt 6 ]; then
 		systemctl restart fail2ban
 		systemctl enable fail2ban
 	else
@@ -86,7 +89,7 @@ ubuntu_install(){
 	debian_install
 }
 unban(){
-	fail2ban-client set ssh-iptables unbanip $1
+	fail2ban-client set ssh-iptables unbanip "$1"
 }
 show_log(){
 	linux_check
@@ -94,7 +97,7 @@ show_log(){
 	if [ "$OS" = "CentOS" ]; then
 		cat /var/log/secure* | grep 'Failed password' | awk 'BEGIN{sum=0;}{sum ++;if ($9 == "invalid") { print $11 "\t" $13 } else { print $9 "\t" $11; }}END{ print "SUM:" sum}' 
 	else
-		cat /var/log/auth.log | grep 'Failed password' | awk 'BEGIN{sum=0;}{sum ++;if ($9 == "invalid") { print $11 "\t" $13 } else { print $9 "\t" $11; }}END{ print "SUM:" sum}' 
+		grep 'Failed password' /var/log/auth.log | awk 'BEGIN{sum=0;}{sum ++;if ($9 == "invalid") { print $11 "\t" $13 } else { print $9 "\t" $11; }}END{ print "SUM:" sum}' 
 	fi
 }
 uninstall() {
@@ -107,8 +110,8 @@ uninstall() {
 	rm /etc/fail2ban/ -rf
 	rm /var/run/fail2ban/ -rf
 }
-function root_check {
-	if [[ $EUID -ne 0 ]]; then
+root_check() {
+	if [ $(id -u) -ne 0 ]; then
 		echo "Error:This script must be run as root!" 1>&2
 		exit 1
 	fi
@@ -124,7 +127,7 @@ case $1 in
 		echo "showlog		show failed login logs"
 		echo "unban <ip>		unban ip";;
 	unban)
-		unban $2
+		unban "$2"
 		;;
 	showlog)
 		show_log;;
