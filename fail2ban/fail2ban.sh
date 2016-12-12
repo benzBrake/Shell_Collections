@@ -53,14 +53,13 @@ write_conf() {
 	sed -i "s%SSH_PORT%$SSH_PORT%g" /etc/fail2ban/jail.conf
 	sed -i "s%LOG_PATH%$LOG_PATH%g" /etc/fail2ban/jail.conf
 	unset LOG_PATH
-	 [ -d /var/run/fail2ban ] || mkdir -p /var/run/fail2ban
+	[ -d /var/run/fail2ban ] || mkdir -p /var/run/fail2ban
 }
 centos_install(){
 	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$OS_VSRSION.noarch.rpm"
 	yum -y install fail2ban
-	
-	if [ "$OS_VSRSION" -gt 6 ]; then
-		cat > /etc/fail2ban/jail.local <<EOF
+	[ -d /var/run/fail2ban ] || mkdir -p /var/run/fail2ban
+	cat > /etc/fail2ban/jail.local <<EOF
 #
 # JAILS
 #
@@ -72,10 +71,10 @@ logpath  = $LOG_PATH
 maxretry = 6
 action = iptables[name=SSH, port=$SSH_PORT, protocol=tcp]
 EOF
+	if [ "$OS_VSRSION" -gt 6 ]; then
 		systemctl restart fail2ban
 		systemctl enable fail2ban
 	else
-		write_conf
 		service fail2ban restart
 		chkconfig fail2ban on
 	fi
