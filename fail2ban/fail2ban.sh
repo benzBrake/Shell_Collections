@@ -29,6 +29,7 @@ linux_check(){
 	}
 }
 install(){
+	[ ! -f ~/bin/fb.sh ] || exit 1
 	linux_check
 	if [ "$OS" = "CentOS" ]; then
 		LOG_PATH="/var/log/secure"
