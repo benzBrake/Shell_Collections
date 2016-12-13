@@ -44,13 +44,13 @@ install(){
 		ubuntu_install
 	fi
 	[ -d ~/bin ] || mkdir -p ~/bin
-	wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/fail2ban.sh -O ~/bin/fb.sh
+	wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/fail2ban.sh -O ~/bin/fb.sh
 	chmod +x ~/bin/fb.sh
 }
 write_conf() {
 	 [ -d /etc/fail2ban ] || mkdir -p /etc/fail2ban
 	cd /etc/fail2ban
-	wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/fail2ban.tar.gz -O- | tar -zxvf -
+	wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/fail2ban.tar.gz -O- | tar -zxvf -
 	sed -i "s%SSH_PORT%$SSH_PORT%g" /etc/fail2ban/jail.conf
 	sed -i "s%LOG_PATH%$LOG_PATH%g" /etc/fail2ban/jail.conf
 	unset LOG_PATH
@@ -60,7 +60,7 @@ centos_install(){
 	rpm -ivh "https://dl.fedoraproject.org/pub/epel/epel-release-latest-$OS_VSRSION.noarch.rpm"
 	yum -y install fail2ban
 	[ -d /var/run/fail2ban ] || mkdir -p /var/run/fail2ban
-	wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/jail.local.centos -O /etc/fail2ban/jail.local
+	wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/fail2ban/jail.local.centos -O /etc/fail2ban/jail.local
 	sed -i "s%SSH_PORT%$SSH_PORT%g" /etc/fail2ban/jail.local
 	sed -i "s%LOG_PATH%$LOG_PATH%g" /etc/fail2ban/jail.local
 	if [ "$OS_VSRSION" -gt 6 ]; then
