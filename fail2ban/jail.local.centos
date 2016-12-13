@@ -7,4 +7,4 @@ port	= SSH_PORT
 filter	= sshd
 logpath  = LOG_PATH
 maxretry = 6
-action = iptables[name=SSH, port=$SSH_PORT, protocol=tcp]
+action = iptables[name=SSH, port=SSH_PORT, protocol=tcp]
