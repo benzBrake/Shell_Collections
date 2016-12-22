@@ -87,22 +87,22 @@ install() {
 				echo "Failed to download ShadowsocksR chkconfig file!"
 				exit 1
 			fi
-			sed -i "s#/usr/local/shadowsock-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
+			sed -i "s#/usr/local/shadowsocks-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
 			chmod +x /etc/init.d/shadowsocks
-			chkconfig --add shadowsocks
-			chkconfig shadowsocks on
+			update-rc.d -f shadowsocks defaults
 		elif [ -n "$(command -v yum)" ]; then 
 			if ! wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/shadowsocks_installer/shadowsocksR -O /etc/init.d/shadowsocks; then
 				echo "Failed to download ShadowsocksR chkconfig file!"
 				exit 1
 			fi
-			sed -i "s#/usr/local/shadowsock-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
+			sed -i "s#/usr/local/shadowsocks-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
 			chmod +x /etc/init.d/shadowsocks
-			update-rc.d -f shadowsocks defaults
+			chkconfig --add shadowsocks
+			chkconfig shadowsocks on
 		fi 
 		# Set up firewall rules
 		echo "Set up firewall rules"
-		if [ OS_VERSION -eq 7 ]; then
+		if [ $OS_VERSION -eq 7 ]; then
 			systemctl status firewalld > /dev/null 2>&1
 			if [ $? -eq 0 ]; then
 				firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp
@@ -167,7 +167,7 @@ end() {
 	echo -e "Encryption Method: \033[41;37m aes-256-cfb \033[0m"
 }
 install_shadowsocks() {
-	if [ -f "${INSTALL_DIR}/shadowsocks-rss/server.py" ]; then
+	if [ -f "/etc/shadowsocks_uninstall" ]; then
 		echo "it seem that you have installed shadowsocksR"
 		exit 1
 	fi
