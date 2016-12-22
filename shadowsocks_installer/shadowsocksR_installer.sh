@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-INSTALL_DIR=/usr/local/
-INSTALL_DIR=$(echo ${INSTALL_DIR} | sed 's#/$##')
 OS_VERSION=$(grep -oEh "[0-9]+" /etc/*-release | head -n 1) || {
 		cat >&2 <<-'EOF'
 		Fail to detect os version, please feed back to author!
@@ -15,33 +13,7 @@ get_ip(){
     [ ! -z ${IP} ] && echo ${IP} || echo
 }
 #Current folder
-cur_dir=$(pwd)
-#Check Root
-[ $(id -u) != "0" ] && { echo "${CFAILURE}Error: You must be root to run this script${CEND}"; exit 1; }
-question() {
-	# Set ShadowsocksR config password
-	echo "Please input password for ShadowsocksR:"
-	read -p "(Default password: doufu.ru):" shadowsockspwd
-	[ -z "${shadowsockspwd}" ] && shadowsockspwd="doufu.ru"
-	# Set ShadowsocksR config port
-	while true
-	do
-	echo -e "Please input port for ShadowsocksR [1-65535]:"
-	read -p "(Default port: 8989):" shadowsocksport
-	[ -z "${shadowsocksport}" ] && shadowsocksport="8989"
-	expr ${shadowsocksport} + 0 &>/dev/null
-	if [ $? -eq 0 ]; then
-		if [ ${shadowsocksport} -ge 1 ] && [ ${shadowsocksport} -le 65535 ]; then
-			echo "port = ${shadowsocksport}"
-			break
-		else
-			echo "Input error, please input correct number"
-		fi
-	else
-		echo "Input error, please input correct number"
-	fi
-	done
-}
+CUR_DIR=$(pwd)
 prepare() {
 	rm -rf /etc/localtime
 	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -86,7 +58,7 @@ prepare() {
 	fi
 }
 install() {
-	cd "$cur_dir"
+	cd "$CUR_DIR"
 	whereis libsodium.so 2>&1 | grep -i 'libsodium.so' >/dev/null
 	if [ $? -ne 0 ]; then
 		#Intall libsodium
@@ -98,7 +70,7 @@ install() {
 			exit 1
 		fi
 		echo "/usr/local/lib" > /etc/ld.so.conf.d/local.conf && ldconfig
-		cd "$cur_dir" && rm -rf libsodium*
+		cd "$CUR_DIR" && rm -rf libsodium*
 	fi
 	#Install shadowsocksR
 	cd "$INSTALL_DIR"
@@ -107,15 +79,15 @@ install() {
 		exit 1
 	fi
 	unzip manyuser.zip && rm manyuser.zip
-	mv -f shadowsocks-manyuser/shadowsocks ${INSTALL_DIR}/shadowsocks-rss
+	mv -f shadowsocks-manyuser/shadowsocks ${INSTALL_DIR}/${FOLDER}
 	rm -rf shadowsocks-manyuser
-	if [ -f "${INSTALL_DIR}/shadowsocks-rss/server.py" ]; then
+	if [ -f "${INSTALL_DIR}/${FOLDER}/server.py" ]; then
 		if [ -n "$(command -v apt-get)" ]; then
 			if ! wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/shadowsocks_installer/shadowsocksR-debian -O /etc/init.d/shadowsocks; then
 				echo "Failed to download ShadowsocksR chkconfig file!"
 				exit 1
 			fi
-			sed -i "s#/usr/local#${INSTALL_DIR}#g" /etc/init.d/shadowsocks
+			sed -i "s#/usr/local/shadowsock-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
 			chmod +x /etc/init.d/shadowsocks
 			chkconfig --add shadowsocks
 			chkconfig shadowsocks on
@@ -124,7 +96,7 @@ install() {
 				echo "Failed to download ShadowsocksR chkconfig file!"
 				exit 1
 			fi
-			sed -i "s#/usr/local#${INSTALL_DIR}#g" /etc/init.d/shadowsocks
+			sed -i "s#/usr/local/shadowsock-rss#${INSTALL_DIR}/${FOLDER}#g" /etc/init.d/shadowsocks
 			chmod +x /etc/init.d/shadowsocks
 			update-rc.d -f shadowsocks defaults
 		fi 
@@ -133,33 +105,37 @@ install() {
 		if [ OS_VERSION -eq 7 ]; then
 			systemctl status firewalld > /dev/null 2>&1
 			if [ $? -eq 0 ]; then
-				firewall-cmd --permanent --zone=public --add-port=${shadowsocksport}/tcp
-				firewall-cmd --permanent --zone=public --add-port=${shadowsocksport}/udp
+				firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp
+				firewall-cmd --permanent --zone=public --add-port=${PORT}/udp
 				firewall-cmd --reload
 			else
 				systemctl start firewalld
 				if [ $? -eq 0 ]; then
-					firewall-cmd --permanent --zone=public --add-port=${shadowsocksport}/tcp
-					firewall-cmd --permanent --zone=public --add-port=${shadowsocksport}/udp
+					firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp
+					firewall-cmd --permanent --zone=public --add-port=${PORT}/udp
 					firewall-cmd --reload
 				fi
 			fi
 		fi
 		/etc/init.d/iptables status > /dev/null 2>&1
 		if [ $? -eq 0 ]; then
-			iptables -L -n | grep -i ${shadowsocksport} > /dev/null 2>&1
-			iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${shadowsocksport} -j ACCEPT
-			iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${shadowsocksport} -j ACCEPT
+			iptables -L -n | grep -i ${PORT} > /dev/null 2>&1
+			iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${PORT} -j ACCEPT
+			iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${PORT} -j ACCEPT
 		fi
+		cat > /etc/shadowsocks_uninstall <<-EOF
+INSTALL_DIR=${INSTALL_DIR}
+FOLDER=${FOLDER}
+EOF
 		# Write Config
 		cat > /etc/shadowsocks.json<<-EOF
 {
 	"server":"0.0.0.0",
 	"server_ipv6":"::",
-	"server_port":${shadowsocksport},
+	"server_port":${PORT},
 	"local_address":"127.0.0.1",
 	"local_port":1080,
-	"password":"${shadowsockspwd}",
+	"password":"${PASSWORD}",
 	"timeout":120,
 	"method":"aes-256-cfb",
 	"protocol":"origin",
@@ -182,8 +158,8 @@ end() {
 	echo
 	echo "Congratulations, ShadowsocksR install completed!"
 	echo -e "Server IP: \033[41;37m $(get_ip) \033[0m"
-	echo -e "Server Port: \033[41;37m ${shadowsocksport} \033[0m"
-	echo -e "Password: \033[41;37m ${shadowsockspwd} \033[0m"
+	echo -e "Server Port: \033[41;37m ${PORT} \033[0m"
+	echo -e "Password: \033[41;37m ${PASSWORD} \033[0m"
 	echo -e "Local IP: \033[41;37m 127.0.0.1 \033[0m"
 	echo -e "Local Port: \033[41;37m 1080 \033[0m"
 	echo -e "Protocol: \033[41;37m origin \033[0m"
@@ -201,6 +177,7 @@ install_shadowsocks() {
 	end
 }
 uninstall_shadowsocks(){
+	source /etc/shadowsocks_uninstall
 	printf "Are you sure uninstall ShadowsocksR? (y/n)"
 	printf "\n"
 	read -p "(Default: n):" answer
@@ -215,7 +192,8 @@ uninstall_shadowsocks(){
 		rm -f /etc/shadowsocks.json
 		rm -f /etc/init.d/shadowsocks
 		rm -f /var/log/shadowsocks.log
-		rm -rf "${INSTALL_DIR}/shadowsocks-rss"
+		rm -rf "${INSTALL_DIR}/${FOLDER}"
+		rm -f /etc/shadowsocks_uninstall
 		echo "ShadowsocksR uninstall success!"
 	else
 		echo
@@ -223,14 +201,115 @@ uninstall_shadowsocks(){
 		echo
 	fi
 }
-action=$1
-[ -z $1 ] && action=install
-case "$action" in
-	install|uninstall)
-	${action}_shadowsocks
+help_info() {
+	echo "$(basename $0) [option]"
+	echo "-p,--DIRECTORY"
+	echo "	"
+}
+action=$@
+for i in "$@"
+do
+	case $i in
+	-i=*|--install=*)
+		if test -z "$FLAG" ; then
+			FLAG=install
+			DIRECTORY="${i#*=}"
+		elif [ "$FLAG" == "uninstall" ]; then
+			ERROR=yes
+			HELP=yes
+		fi
+		shift
+	;;
+	-i|--install)
+		if test -z "$FLAG" ; then
+			FLAG=install
+		elif [ "$FLAG" == "uninstall" ]; then
+			ERROR=yes
+			HELP=yes
+		fi
+		shift
+	;;
+	-f=*|--folder=*)
+		FOLDER="${i#*=}"
+		shift
+	;;
+	-p=*|--port=*)
+		PORT="${i#*=}"
+	;;
+	-k=*|--password=*)
+		PASSWORD="${i#*=}"
+	;;
+	-u|--uninstall|uninstall)
+		if test -z "$FLAG"  && test -z "$DIRECTORY" ; then
+			FLAG=uninstall
+		else
+			ERROR=yes
+			HELP=yes
+		fi
+		shift
+	;;
+	-h|--help)
+		FLAG=
+		HELP=yes
+		shift
 	;;
 	*)
-	echo "Arguments error! [${action}]"
-	echo "Usage: $(basename $0) {install|uninstall}"
+		# unknown option
+		FLAG=
+		ERROR=yes
+		HELP=yes
 	;;
-esac
+	esac
+done
+test "$ERROR" == "yes" && echo -e "Arguments error! [$action] \n ========================="
+if test -z $FLAG ; then
+	test "$HELP" == "yes"  && help_info
+elif test "$ERROR" != "yes" ; then
+	#Check Root
+	[ $(id -u) != "0" ] && { echo "${CFAILURE}Error: You must be root to run this script${CEND}"; exit 1; }
+	if test "$FLAG" == "install"; then
+		# Set ShadowsocksR install directory
+		if test -z "$DIRECTORY"; then
+			INSTALL_DIR=/usr/local
+		else
+			INSTALL_DIR=$(echo ${DIRECTORY} | sed 's#/$##')
+		fi
+		if test -z "$FOLDER"; then
+			FOLDER=shadowsocks-rss
+		else
+			FOLDER=${FOLDER//\//}
+		fi
+		# Set ShadowsocksR config password
+		test -z "$PASSWORD" && {
+			echo "Please input password for ShadowsocksR:"
+			read -p "(Default password: doufu.ru):" PASSWORD
+			test -z "${PASSWORD}"  && PASSWORD="doufu.ru"
+		}
+		# Set ShadowsocksR config port
+		test -z "$PORT" && {
+			
+			while true
+			do
+			echo -e "Please input port for ShadowsocksR [1-65535]:"
+			read -p "(Default port: 8989):" PORT
+			test -z "${PORT}" && PORT="8989"
+			expr ${PORT} + 0 &>/dev/null
+			if [ $? -eq 0 ]; then
+				if [ ${PORT} -ge 1 ] && [ ${PORT} -le 65535 ]; then
+					break
+				else
+					echo "Input error, please input correct number"
+				fi
+			else
+				echo "Input error, please input correct number"
+			fi
+			done
+		}
+		prepare
+		install
+		end
+	elif test "$FLAG" == "uninstall" ; then
+		uninstall_shadowsocks
+	fi
+fi
+test -z "$action" && help_info
