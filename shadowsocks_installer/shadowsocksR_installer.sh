@@ -203,9 +203,19 @@ uninstall_shadowsocks(){
 	fi
 }
 help_info() {
-	echo "$(basename $0) [option]"
-	echo "-p,--DIRECTORY"
-	echo "	"
+	echo "Usage: $(basename $0) [OPTION[=PATTERN]]"
+	echo "A ShadowsocksR Installer and Uninstaller."
+	echo "Different OPTION has different PATTERN."
+	echo "Example: $(basename $0) -i -p=443"
+	echo ""
+	echo "OPTIONs and PATTERNs"
+	echo "  -i,-install			install ShadowsocksR"
+	echo "  -u,-uninstall			uninstall ShadowsocksR"
+	echo "  -p=NUM,--port=NUM		ShadowsocksR port"
+	echo "  -k=STR,--password=STR		ShadowsocksR password"
+	echo ""
+	echo "Report bugs to github-char1sma@woai.ru"
+	echo "Thanks to Teddysun <i@teddysun.com>"
 }
 action=$@
 for i in "$@"
@@ -262,7 +272,7 @@ do
 	;;
 	esac
 done
-test "$ERROR" == "yes" && echo -e "Arguments error! [$action] \n ========================="
+test "$ERROR" == "yes" && echo -e "$(basename $0):Arguments error! [$action]\n============================="
 if test -z $FLAG ; then
 	test "$HELP" == "yes"  && help_info
 elif test "$ERROR" != "yes" ; then
