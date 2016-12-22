@@ -276,7 +276,7 @@ elif test "$ERROR" != "yes" ; then
 			INSTALL_DIR=$(echo ${DIRECTORY} | sed 's#/$##')
 		fi
 		if test -z "$FOLDER"; then
-			FOLDER=shadowsocks-rss
+			FOLDER=shadowsocks
 		else
 			FOLDER=${FOLDER//\//}
 		fi
