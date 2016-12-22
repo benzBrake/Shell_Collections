@@ -102,7 +102,7 @@ install() {
 		fi 
 		# Set up firewall rules
 		echo "Set up firewall rules"
-		if [ $OS_VERSION -eq 7 ]; then
+		if [ $OS_VERSION -eq 7 ] && [ -n "$(command -v yum)" ]; then
 			systemctl status firewalld > /dev/null 2>&1
 			if [ $? -eq 0 ]; then
 				firewall-cmd --permanent --zone=public --add-port=${PORT}/tcp
@@ -116,12 +116,13 @@ install() {
 					firewall-cmd --reload
 				fi
 			fi
-		fi
-		/etc/init.d/iptables status > /dev/null 2>&1
-		if [ $? -eq 0 ]; then
-			iptables -L -n | grep -i ${PORT} > /dev/null 2>&1
-			iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${PORT} -j ACCEPT
-			iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${PORT} -j ACCEPT
+		else
+			/etc/init.d/iptables status > /dev/null 2>&1
+			if [ $? -eq 0 ]; then
+				iptables -L -n | grep -i ${PORT} > /dev/null 2>&1
+				iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${PORT} -j ACCEPT
+				iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${PORT} -j ACCEPT
+			fi
 		fi
 		cat > /etc/shadowsocks_uninstall <<-EOF
 INSTALL_DIR=${INSTALL_DIR}
