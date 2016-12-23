@@ -117,12 +117,13 @@ install() {
 				fi
 			fi
 		else
-			/etc/init.d/iptables status > /dev/null 2>&1
-			if [ $? -eq 0 ]; then
+			test $(command -v iptables) && {
 				iptables -L -n | grep -i ${PORT} > /dev/null 2>&1
-				iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${PORT} -j ACCEPT
-				iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${PORT} -j ACCEPT
-			fi
+				if test $? -ne 0 ; then
+					iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${PORT} -j ACCEPT
+					iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${PORT} -j ACCEPT
+				fi
+			}
 		fi
 		cat > /etc/shadowsocks_uninstall <<-EOF
 INSTALL_DIR=${INSTALL_DIR}
@@ -247,6 +248,10 @@ do
 	-m=*|--method=*)
 		METHOD="${i#*=}"
 	;;
+	-l=*|--protocol=*)
+		PROTO="${i#*=}"
+	;;
+	
 	-O=*|--obfs=*)
 		OBFS="${i#*=}"
 	;;
@@ -317,7 +322,7 @@ elif test "$ERROR" != "yes" ; then
 			done
 		}
 		test -z "${METHOD}" && METHOD="chacha20"
-		test -z "${PROTO}" && PROTO="origin"
+		test -z "${PROTO}" && PROTO="auth_sha1_compatible"
 		test -z "${OBFS}" && OBFS="http_simple_compatible"
 		test -z "${OBFS_PARAM}" && test $(echo ${OBFS} |grep -i 'http_simple') && OBFS_PARAM="bing.com,microsoft.com,live.com,outlook.com"
 		prepare
