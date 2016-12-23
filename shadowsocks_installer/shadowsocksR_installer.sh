@@ -50,7 +50,7 @@ prepare() {
 			apt-get -y install $packages
 		done
 	elif [ -n "$(command -v yum)" ]; then 
-		for packages in unzip openssl-devel gcc swig python python-devel python-setuptools autoconf libtool libevent automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel
+		for packages in unzip openssl-devel gcc swig python python-devel python-setuptools m2crypto autoconf libtool libevent automake make curl curl-devel zlib-devel perl perl-devel cpio expat-devel gettext-devel
 		do
 			echo -e "|\n|   Notice: Installing required package '$packages' via 'yum'"
 			yum -y install $packages
@@ -138,23 +138,23 @@ EOF
 	"local_port":1080,
 	"password":"${PASSWORD}",
 	"timeout":120,
-	"method":"aes-256-cfb",
-	"protocol":"origin",
+	"method":"${METHOD}",
+	"protocol":"${PROTO}",
 	"protocol_param":"",
-	"obfs":"plain",
-	"obfs_param":"",
+	"obfs":"${OBFS}",
+	"obfs_param":"${OBFS_PARAM}",
 	"redirect":"",
 	"dns_ipv6":false,
 	"fast_open":false,
 	"workers":1
 }
 EOF
-		/etc/init.d/shadowsocks start
+		end
 	fi
 }
 end() {
-	#clean up
-	
+	/etc/init.d/shadowsocks start
+	test $? -ne 0 && { echo -e "\033[41;37m [ERROR] \033[0m Shadowsocks install failed!";exit 1; }
 	clear
 	echo
 	echo "Congratulations, ShadowsocksR install completed!"
@@ -163,16 +163,12 @@ end() {
 	echo -e "Password: \033[41;37m ${PASSWORD} \033[0m"
 	echo -e "Local IP: \033[41;37m 127.0.0.1 \033[0m"
 	echo -e "Local Port: \033[41;37m 1080 \033[0m"
-	echo -e "Protocol: \033[41;37m origin \033[0m"
-	echo -e "obfs: \033[41;37m plain \033[0m"
-	echo -e "Encryption Method: \033[41;37m aes-256-cfb \033[0m"
+	echo -e "Protocol: \033[41;37m ${PROTO} \033[0m"
+	echo -e "obfs: \033[41;37m ${OBFS} \033[0m"
+	echo -e "obfs_param: \033[41;37m ${OBFS_PARAM} \033[0m"
+	echo -e "Encryption Method: \033[41;37m ${METHOD} \033[0m"
 }
 install_shadowsocks() {
-	if [ -f "/etc/shadowsocks_uninstall" ]; then
-		echo "it seem that you have installed shadowsocksR"
-		exit 1
-	fi
-	question
 	prepare
 	install
 	end
@@ -213,6 +209,8 @@ help_info() {
 	echo "  -u,-uninstall			uninstall ShadowsocksR"
 	echo "  -p=NUM,--port=NUM		ShadowsocksR port"
 	echo "  -k=STR,--password=STR		ShadowsocksR password"
+	echo "  -m=STR,--method=STR		Encryption Method"
+	echo "  -O=STR,--obfs=STR		OBFS Plugin"
 	echo ""
 	echo "Report bugs to github-char1sma@woai.ru"
 	echo "Thanks to Teddysun <i@teddysun.com>"
@@ -240,15 +238,20 @@ do
 		fi
 		shift
 	;;
-	-f=*|--folder=*)
-		FOLDER="${i#*=}"
-		shift
-	;;
 	-p=*|--port=*)
 		PORT="${i#*=}"
 	;;
 	-k=*|--password=*)
 		PASSWORD="${i#*=}"
+	;;
+	-m=*|--method=*)
+		METHOD="${i#*=}"
+	;;
+	-O=*|--obfs=*)
+		OBFS="${i#*=}"
+	;;
+	-o=*|--obfs-param=*)
+		OBFS_PARAM="${i#*=}"
 	;;
 	-u|--uninstall|uninstall)
 		if test -z "$FLAG"  && test -z "$DIRECTORY" ; then
@@ -279,17 +282,15 @@ elif test "$ERROR" != "yes" ; then
 	#Check Root
 	[ $(id -u) != "0" ] && { echo "${CFAILURE}Error: You must be root to run this script${CEND}"; exit 1; }
 	if test "$FLAG" == "install"; then
+		test -f /etc/shadowsocks_uninstall && { echo -e "\033[41;37m [ERROR] \033[0m It seem that you have installed shadowsocksR!";exit 1; }
 		# Set ShadowsocksR install directory
 		if test -z "$DIRECTORY"; then
 			INSTALL_DIR=/usr/local
 		else
 			INSTALL_DIR=$(echo ${DIRECTORY} | sed 's#/$##')
 		fi
-		if test -z "$FOLDER"; then
-			FOLDER=shadowsocks
-		else
-			FOLDER=${FOLDER//\//}
-		fi
+		# FOLDER can not be changed!
+		FOLDER=shadowsocks
 		# Set ShadowsocksR config password
 		test -z "$PASSWORD" && {
 			echo "Please input password for ShadowsocksR:"
@@ -298,7 +299,6 @@ elif test "$ERROR" != "yes" ; then
 		}
 		# Set ShadowsocksR config port
 		test -z "$PORT" && {
-			
 			while true
 			do
 			echo -e "Please input port for ShadowsocksR [1-65535]:"
@@ -316,9 +316,12 @@ elif test "$ERROR" != "yes" ; then
 			fi
 			done
 		}
+		test -z "${METHOD}" && METHOD="chacha20"
+		test -z "${PROTO}" && PROTO="origin"
+		test -z "${OBFS}" && OBFS="http_simple_compatible"
+		test -z "${OBFS_PARAM}" && test $(echo ${OBFS} |grep -i 'http_simple') && OBFS_PARAM="bing.com,microsoft.com,live.com,outlook.com"
 		prepare
 		install
-		end
 	elif test "$FLAG" == "uninstall" ; then
 		uninstall_shadowsocks
 	fi

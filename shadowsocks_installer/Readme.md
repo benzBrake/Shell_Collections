@@ -11,15 +11,15 @@ RAM >= 128 MB
 > 
 > Password: doufu.ru
 > 
-> Method: AES-256-CFB
+> Method: chacha20
 > 
 > Protoco: origin
 > 
-> Protocol param: ""
+> Protocol param: 
 > 
-> Obfs: plain
+> Obfs: http_simple_compatible
 > 
-> Obfs param: ""
+> Obfs param: bing.com,microsoft.com,live.com,outlook.com
 
 ### Usage
 #### Install
