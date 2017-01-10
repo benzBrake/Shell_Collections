@@ -35,17 +35,17 @@ prepare() {
 	fi
 	#install dependence
 	if [ -n "$(command -v apt-get)" ]; then
+		if [ ${OS_VERSION} -eq 6 ]; then
+			echo 'Acquire::Check-Valid-Until "false";' >/etc/apt/apt.conf.d/90ignore-release-date
+			echo "deb http://archive.debian.org/debian-archive/debian squeeze main" > /etc/apt/sources.list
+			echo "deb http://archive.debian.org/debian-archive/debian squeeze-proposed-updates main" >> /etc/apt/sources.list
+			echo "deb http://security.debian.org squeeze/updates main" >> /etc/apt/sources.list
+			echo "deb http://archive.debian.org/debian-archive/debian squeeze-lts main contrib non-free" >> /etc/apt/sources.list
+			apt-get -y install debian-archive-keyring
+		fi
 		apt-get -y update
 		for packages in python python-dev python-pip python-m2crypto curl wget unzip gcc swig automake make perl cpio build-essential
 		do
-			if [ ${OS_VERSION} -eq 6 ]; then
-				echo 'Acquire::Check-Valid-Until "false";' >/etc/apt/apt.conf.d/90ignore-release-date
-				echo "deb http://archive.debian.org/debian-archive/debian squeeze main" > /etc/apt/sources.list
-				echo "deb http://archive.debian.org/debian-archive/debian squeeze-proposed-updates main" >> /etc/apt/sources.list
-				echo "deb http://security.debian.org squeeze/updates main" >> /etc/apt/sources.list
-				echo "deb http://archive.debian.org/debian-archive/debian squeeze-lts main contrib non-free" >> /etc/apt/sources.list
-				apt-get -y install debian-archive-keyring
-			fi
 			echo -e "|\n|   Notice: Installing required package '$packages' via 'apt-get'"
 			apt-get -y install $packages
 		done
