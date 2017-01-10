@@ -79,8 +79,8 @@ install() {
 		exit 1
 	fi
 	unzip manyuser.zip && rm manyuser.zip
-	mv -f shadowsocks-manyuser/shadowsocks ${INSTALL_DIR}/${FOLDER}
-	rm -rf shadowsocks-manyuser
+	mv -f shadowsocksr-manyuser/shadowsocks ${INSTALL_DIR}/${FOLDER}
+	rm -rf shadowsocksr-manyuser
 	if [ -f "${INSTALL_DIR}/${FOLDER}/server.py" ]; then
 		if [ -n "$(command -v apt-get)" ]; then
 			if ! wget --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/shadowsocks_installer/shadowsocksR-debian -O /etc/init.d/shadowsocks; then
