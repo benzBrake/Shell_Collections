@@ -7,7 +7,7 @@ sh -c "$(wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/maste
 ## gdrive_cli.sh
 Install prasmussen/gdrive automatic
 ```shell
-sh -c "$(wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/gdrive_cli.sh -O -)"
+bash -c "$(wget https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/gdrive_cli.sh -O -)"
 ```
 ## iptables_rules.sh
 Useful iptables rules (not work on CentOS 7/RHEL 7)
