@@ -1,0 +1,102 @@
+#! /bin/sh
+# chkconfig: 2345 55 25
+# Description: Startup script for supervisor daemon on Debian. Place in /etc/init.d and
+# run 'update-rc.d -f supervisord defaults', or use the appropriate command on your
+# distro. For CentOS/Redhat run: 'chkconfig --add supervisord'
+
+### BEGIN INIT INFO
+# Provides:          supervisor
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the supervisor daemon
+# Description:       starts $NAME using start-stop-daemon
+### END INIT INFO
+
+# Author:   Ryan
+# website:  https://blog.iplayloli.com
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=supervisord
+SUPERVISOR_BIN=/usr/bin/$NAME
+DAEMON_OPTS=""
+PIDFILE=/var/run/$NAME.pid
+DAEMON_OPTS="-c /etc/supervisor/supervisord.conf $DAEMON_OPTS"
+StatBin=/bin/netstat
+get_pid() {
+    ps -ef | grep -v grep | grep /usr/bin/supervisord | awk '{print $2}'
+}
+
+stop() {
+    if test -z "$($StatBin -ano | grep $NAME)"; then
+        echo "$NAME is is stopped."
+        exit 1
+    fi
+
+    kill `get_pid`
+
+    if [ "$?" != 0 ] ; then
+        echo " failed"
+        exit 1
+    else
+        echo " done"
+    fi
+}
+
+case "$1" in
+    start)
+        echo -n "Starting $NAME... "
+
+        if ! test -z "$($StatBin -ano | grep $NAME)";then
+            echo "$NAME (pid `get_pid`) already running."
+            exit 1
+        fi
+
+        $SUPERVISOR_BIN $DAEMON_OPTS
+
+        if [ "$?" != 0 ] ; then
+            echo " failed"
+            exit 1
+        else
+            echo " done"
+        fi
+        ;;
+
+    stop)
+        echo -n "Stoping $NAME... "
+        stop
+        ;;
+
+    status)
+        if ! test -z "$($StatBin -ano | grep $NAME)"; then
+            PID=`get_pid`
+            echo "$NAME (pid $PID) is running..."
+        else
+            echo "$NAME is stopped."
+            exit 0
+        fi
+        ;;
+
+    force-quit|kill)
+        echo -n "Terminating $NAME... "
+        stop
+        ;;
+    reload)
+        if test -z "$($StatBin -ano | grep $NAME)"; then
+            echo -e "$NAME is stopped.\n Failed!"
+            exit 1
+        fi
+        /usr/bin/supervisorctl reread
+        ;;
+    restart)
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status|force-quit|kill}"
+        exit 1
+        ;;
+esac
