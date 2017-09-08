@@ -92,9 +92,9 @@ if [ -z "$ERROR" ]; then
                     pip install meld3==0.6.7
                     pip install supervisor
                     mkdir -pv /etc/supervisor/conf.d /var/log/supervisor/
-                    wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/supervisord.conf -O /etc/supervisor/supervisord.conf
+                    wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/supervisord/supervisord.conf -O /etc/supervisor/supervisord.conf
                     [ ! -f /etc/init.d/supervisord ] && {
-                        wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/supervisord -O /etc/init.d/supervisord
+                        wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/supervisord/supervisord -O /etc/init.d/supervisord
                         chmod +x /etc/init.d/supervisord
                         chkconfig --add supervisord
                         chkconfig supervisord on
