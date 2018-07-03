@@ -40,7 +40,7 @@ a:hover { text-decoration: none; color: #C00; background: #FC0; }
    <li>访问端口：<?php echo $_SERVER['SERVER_PORT'];?></li>
    <li>PHP版本：<?php echo PHP_VERSION;?></li>
    <li>根目录：  <?php echo $_SERVER['DOCUMENT_ROOT'] ;?></li>
-   <li>新建虚拟机方法：<a href="https://blog.iplayloli.com/lighttpd-vhost.html">https://blog.iplayloli.com/lighttpd-vhost.html</a></li>
+   <li>新建虚拟机方法：<a href="https://blog.iplayloli.com/lighttpd-create-virtual-host-with-www.html">https://blog.iplayloli.com/lighttpd-create-virtual-host-with-www.html</a></li>
    <li>更多关于内容：<a href="https://blog.iplayloli.com/search/lighttpd/">https://blog.iplayloli.com/search/lighttpd/</a></li>
   </ul>
 
