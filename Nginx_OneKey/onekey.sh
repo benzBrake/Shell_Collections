@@ -220,16 +220,16 @@ EOF
 function install_Service {
 #	Install nginx auto startup service.
 	if [ -n "$(command -v systemctl)" ]; then
-		wget http://demo.ipl.cx/nginx.service -O /lib/systemd/system/nginx.service
+		wget --no-check-certificate https://github.com/benzBrake/Shell_Collections/raw/master/Nginx_OneKey/nginx.service -O /lib/systemd/system/nginx.service
 		sed -i "s@#pid.*@pid     /var/run/nginx.pid;@" $NO_CONF
 		systemctl daemon-reload
 		systemctl enable nginx.service
 	elif [ -n "$(command -v apt-get)" ]; then
-		wget http://demo.ipl.cx/nginx_debian -O /etc/init.d/nginx
+		wget --no-check-certificate https://github.com/benzBrake/Shell_Collections/raw/master/Nginx_OneKey/nginx_debian -O /etc/init.d/nginx
 		chmod +x /etc/init.d/nginx
 		update-rc.d nginx defualts
 	elif [ -n "$(command -v yum)" ]; then
-		wget http://demo.ipl.cx/nginx_rhel -O /etc/init.d/nginx
+		wget --no-check-certificate https://github.com/benzBrake/Shell_Collections/raw/master/Nginx_OneKey/nginx_rhel -O /etc/init.d/nginx
 		chmod +x /etc/init.d/nginx
 		chkconfig nginx enable
 	fi
