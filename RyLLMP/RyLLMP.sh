@@ -106,7 +106,7 @@ ${APTD} purge -y apache*
 ${APTD} -y update && ${APTD} -y upgrade
 ${APTD} install -y lighttpd unzip
 
-if [ "$rymysql" = "y" ]
+if [ "$rymysql" == "y" ]
 then
 	ry_echo "### Start installing MySQL ###"
 	${APTD} install -y mysql-server php5-mysql
@@ -121,27 +121,30 @@ EOF
 	cd /var/llmp
 	#PHPMADL=`${CURLD} https://www.phpmyadmin.net/downloads/ | grep "languages.tar.gz\"" | head -n 1 | sed 's#.*href="##;s#".*##'`
 	# Old Version PMA
-	PHPMADL=https://files.phpmyadmin.net/phpMyAdmin/4.0.10.20/phpMyAdmin-4.0.10.20-all-languages.tar.gz
-	${CURLD} -o phpMyAdmin.tgz ${PHPMADL}
-	if [ $? -eq 127 ]; then
-		# curl commant not found
-		${APTD} -y install curl
+	if [ "$rymysql" == "y"]
+	then
+		PHPMADL=https://files.phpmyadmin.net/phpMyAdmin/4.0.10.20/phpMyAdmin-4.0.10.20-all-languages.tar.gz
 		${CURLD} -o phpMyAdmin.tgz ${PHPMADL}
+		if [ $? -eq 127 ]; then
+			# curl commant not found
+			${APTD} -y install curl
+			${CURLD} -o phpMyAdmin.tgz ${PHPMADL}
+		fi
+		tar zxvf phpMyAdmin.tgz
+		rm -f /var/llmp/phpMyAdmin.tgz
+		mv phpMyAdmin-4.0.10.20-all-languages phpMyAdmin
 	fi
-	tar zxvf phpMyAdmin.tgz
-	rm -f /var/llmp/phpMyAdmin.tgz
-	mv phpMyAdmin-4.0.10.20-all-languages phpMyAdmin
 fi
 
 # Install SQLite
-if [ "$rysqlite" = "y" ]
+if [ "$rysqlite" == "y" ]
 then
 	ry_echo "###Start installing SQLite ###"
 	${APTD} install -y sqlite
 fi
 
 # Install PHP5
-if [ "$ryphp" = "y" ]
+if [ "$ryphp" == "y" ]
 then
 	ry_echo "### Start installing PHP ###"
 	${APTD} install -y php5-cgi php5-common php5-curl php5-gd php5-intl php-pear php5-imagick php5-imap php5-mcrypt php5-snmp php5-sqlite php5-xmlrpc php5-xsl
@@ -154,9 +157,8 @@ fi
 chown -R www-data:www-data /var/log/lighttpd /var/www
 
 # Add default index.php
-cd /var/www
+cd `grep server.document-root /etc/lighttpd/lighttpd.conf | awk -F\" '{print $2}'`
 ${CURLD} -O https://github.com/benzBrake/Shell_Collections/raw/master/RyLLMP/index.php
-rm -f /var/www/index.lighttpd.html
 echo '' >> /etc/lighttpd/lighttpd.conf
 echo 'server.tag="Lighttpd ( For <a href=http://blog.iplayloli.com/llmp.html target=_blank>RyLLMP</a> )"' >> /etc/lighttpd/lighttpd.conf
 service lighttpd restart
