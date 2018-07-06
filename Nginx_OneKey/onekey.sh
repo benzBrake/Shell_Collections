@@ -17,7 +17,7 @@ function slogan {
 echo -n "
 #========================================================================
 # 			Nginx OneKey Install Shell
-# Version :         0.23
+# Version :         0.24
 # Script author :   benzBrake<github-benzbrake@woai.ru>
 # Blog :            http://blog.iplayloli.com
 # System Required : Centos/Debian/Ubuntu
@@ -26,14 +26,15 @@ echo -n "
 " 1>&2
 }
 function startup {
-	cp -r -f /etc/rc.local /etc/rc.local_bak
-	AUTO="$NO_PATH/sbin/nginx"
-	cat /etc/rc.local|grep "$AUTO"
-	if [ $? -ne 0 ]; then
-		sed -i "s#exit 0#$AUTO\nexit 0#" /etc/rc.local
+#	Start Nginx
+	if [ -n "$(command -v systemctl)" ]; then
+		systemctl start nginx.service
+	else
+		/etc/init.d/nginx start
 	fi
 }
 function install {
+#	load config
 	if [ -f "$HOME/nginx_onekey_config" ]; then
 		source "$HOME/nginx_onekey_config"
 	else
@@ -42,14 +43,14 @@ function install {
 	
 #	Start Install
 	mkdir -p "$NO_TEMP"
-	install_nginx
+	install_Nginx
+	startup
 #	Show Config Info
 	cd "$NO_PATH/sbin/"
-	./nginx
 	./nginx -V
 	exit
 }
-function changeversion {
+function change_Version {
 #	load config
 	if [ -f "$HOME/nginx_onekey_config" ];then
 		source $HOME/nginx_onekey_config
@@ -59,14 +60,14 @@ function changeversion {
 		else
 			export NO_NVER=$changever
 		fi
-		rm -f "$HOME/nginx_onekey_config" && write_conf
-		install_nginx
+		rm -f "$HOME/nginx_onekey_config" && write_Conf
+		install_Nginx
 	else
 		echo "It seems that you don't have install Nginx_Onekey"
 		exit 2;
 	fi
 }
-function centos_prepare {
+function centos_Prepare {
 	yum install gcc gcc-c++ make automake -y
 	if [ $? -eq 0 ]; then
 		echo "gcc gcc-c++ make automake installed"
@@ -87,7 +88,7 @@ function centos_prepare {
 		yum install zlib zlib-devel openssl openssl-devel -y
 	fi
 }
-function debian_prepare {
+function debian_Prepare {
 	apt-get update -y
 	apt-get install build-essential -y
 	apt-get install git-core -y
@@ -101,7 +102,7 @@ function debian_prepare {
 	# Remove apache2
 	apt-get -y purge apache2-*
 	
-	# PCRE & OPENSSL & ZLIBn
+	# PCRE & OPENSSL & ZLIB
 	apt-get install -y libpcre3 libpcre3-dev
 	if [ $? -eq 0 ]; then
 		echo "libpcre3 libpcre3-dev installed"
@@ -115,20 +116,25 @@ function debian_prepare {
 		apt-get install -y zlib1g zlib1g-dev openssl libssl-dev
 	fi
 }
-function install_nginx {
+function install_Nginx {
+#	load config
 	source "$HOME/nginx_onekey_config"
 	test -d "$NO_TEMP" || mkdir -p "$NO_TEMP"
 	test -d "$NO_LOGP" || mkdir -p "$NO_LOGP"
-	cd "$NO_TEMP"
+
+#	Install required packages
 	if [ -n "$(command -v yum)" ]; then
-		centos_prepare
+		centos_Prepare
 	else
-		debian_prepare
+		debian_Prepare
 	fi
-	# Add user & group
+
+#	Add user & group
 	/usr/sbin/groupadd -f "$NO_GROUP"
 	/usr/sbin/useradd -g "$NO_GROUP" "$NO_USER"
-	# Download Nginx and Module
+	
+#	Download Nginx and Module
+	cd "$NO_TEMP"
 	wget "http://nginx.org/download/nginx-$NO_NVER.tar.gz"
 	tar -xzvf "nginx-$NO_NVER.tar.gz" || tar -xzvf "nginx-$NO_NVER.tar.gz"
 	NO_OPTS=""
@@ -138,10 +144,12 @@ function install_nginx {
 			NO_OPTS="$NO_OPTS --add-module=$NO_MODULES/$(echo $line | sed 's#/$##')"
 		done
 	}
-	# Compile Nginx
+
+#	Compile Nginx
 	cd "$NO_TEMP/nginx-$NO_NVER"
 	./configure --prefix="$NO_PATH" --conf-path="$NO_CONF" --user="$NO_USER" --group="$NO_GROUP" --error-log-path="$NO_LOGP/error.log" --http-log-path="$NO_LOGP/access.log" --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_gzip_static_module $NO_OPTS
-	# Installation
+
+#	Installation
 	make
 	if [ ! $? -eq 0 ]; then
 		echo "# Compile nginx failed. Exit now!"
@@ -156,9 +164,9 @@ function install_nginx {
 		rm -rf "$HOME/nginx_onekey_config"
 		exit 2
 	fi
-	startup
+	install_Service
 	echo "# nginx sbin path:$NO_PATH/sbin/nginx"
-#4.Make dir and clean
+#	Make dir and clean
 	mkdir -p "$NO_LOGP"
 	rm -rf "$NO_TEMP"
 }
@@ -195,9 +203,9 @@ function question {
 	else 
 		export NO_NVER="$ningx_ver"
 	fi
-	write_conf
+	write_Conf
 }
-function write_conf {
+function write_Conf {
 	cat >> "$HOME/nginx_onekey_config" << EOF
 NO_TEMP=$NO_TEMP
 NO_NVER=$NO_NVER
@@ -209,17 +217,48 @@ NO_CONF=$NO_CONF
 NO_LOGP=$NO_LOGP
 EOF
 }
+function install_Service {
+#	Install nginx auto startup service.
+	if [ -n "$(command -v systemctl)" ]; then
+		wget http://demo.ipl.cx/nginx.service -O /lib/systemd/system/nginx.service
+		sed -i "s@#pid.*@pid     /var/run/nginx.pid;@" $NO_CONF
+		systemctl daemon-reload
+		systemctl enable nginx.service
+	elif [ -n "$(command -v apt-get)" ]; then
+		wget http://demo.ipl.cx/nginx_debian -O /etc/init.d/nginx
+		chmod +x /etc/init.d/nginx
+		update-rc.d nginx defualts
+	elif [ -n "$(command -v yum)" ]; then
+		wget http://demo.ipl.cx/nginx_rhel -O /etc/init.d/nginx
+		chmod +x /etc/init.d/nginx
+		chkconfig nginx enable
+	fi
+}
+function uninstall_Service {
+#	Remove nginx auto startup service.
+	if [ -n "$(command -v systemctl)" ]; then
+		systemctl stop nginx.service
+		systemctl disable nginx.service
+		rm -rf /lib/systemd/system/nginx.service
+		systemctl daemon-reload
+		systemctl reset-failed
+	elif [ -n "$(command -v apt-get)" ]; then
+		service nginx stop
+		update-rc.d nginx remove
+		rm -rf /etc/init.d/nginx
+	elif [ -n "$(command -v yum)" ]; then
+		service nginx stop
+		chkconfig nginx disable
+		rm -rf /etc/init.d/nginx
+	fi
+}
 function uninstall {
-read -p "Are you sure uninstall Nginx_Onekey? (y/N) " answer
+	read -p "Are you sure uninstall Nginx_Onekey? (y/N) " answer
 	if [ -z $answer ]; then
 		answer="n"
 	fi
 	if [ "$answer" = "y" ]; then
-		source $HOME/nginx_onekey_config
-		if [[ -s /etc/rc.local_bak ]]; then
-			rm -f /etc/rc.local
-			mv /etc/rc.local_bak /etc/rc.local
-		fi
+		uninstall_Service
 		clean
 		echo "Nginx_Onekey uninstall success!"
 	else
@@ -228,6 +267,7 @@ read -p "Are you sure uninstall Nginx_Onekey? (y/N) " answer
 	exit
 }
 function clean {
+	rm -rf /var/log/nginx /var/run/nginx.pid
 	rm "$NO_TEMP" -rf
 	rm "$NO_PATH" -rf
 	rm "$NO_LOGP" -rf
@@ -240,7 +280,7 @@ install)
 	install;;
 change)
 	slogan
-	changeversion;;
+	change_Version;;
 uninstall)
 	slogan
 	uninstall;;
