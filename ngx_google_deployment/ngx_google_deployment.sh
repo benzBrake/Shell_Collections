@@ -205,8 +205,7 @@ function clean {
 	rm -rf "$NO_MODULES"
 	rm -f "$HOME/nginx_onekey_config"
 	rm -rf /var/www/google
-	rm "/var/www/ssls/$NO_SEARCH.*" -rf
-	rm "/var/www/ssls/$NO_SCHOLAR.*" -rf
+	rm "/var/www/ssls" -rf
 	echo "# All has been done!"
 }
 function uninstall_Service {
