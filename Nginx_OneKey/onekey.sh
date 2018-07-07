@@ -138,7 +138,7 @@ function install_Nginx {
 	wget "http://nginx.org/download/nginx-$NO_NVER.tar.gz"
 	tar -xzvf "nginx-$NO_NVER.tar.gz" || tar -xzvf "nginx-$NO_NVER.tar.gz"
 	NO_OPTS=""
-	! test-z "$NO_MODULES" && test -d "$NO_MODULES" && {
+	! test -z "$NO_MODULES" && test -d "$NO_MODULES" && {
 		for line in $(ls -F $NO_MODULES | grep '/$')
 		do
 			NO_OPTS="$NO_OPTS --add-module=$NO_MODULES/$(echo $line | sed 's#/$##')"
