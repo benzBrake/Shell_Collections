@@ -147,7 +147,7 @@ function install_Nginx {
 
 #	Compile Nginx
 	cd "$NO_TEMP/nginx-$NO_NVER"
-	./configure --prefix="$NO_PATH" --conf-path="$NO_CONF" --user="$NO_USER" --group="$NO_GROUP" --error-log-path="$NO_LOGP/error.log" --http-log-path="$NO_LOGP/access.log" --pid-path=/var/run/nginx/nginx.pid --lock-path=/var/lock/nginx.lock --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_gzip_static_module $NO_OPTS
+	./configure --prefix="$NO_PATH" --conf-path="$NO_CONF" --user="$NO_USER" --group="$NO_GROUP" --error-log-path="$NO_LOGP/error.log" --http-log-path="$NO_LOGP/access.log" --pid-path=/var/run/nginx.pid --lock-path=/var/lock/nginx.lock --with-pcre-jit --with-ipv6 --with-http_ssl_module --with-http_stub_status_module --with-http_gzip_static_module $NO_OPTS
 
 #	Installation
 	make
