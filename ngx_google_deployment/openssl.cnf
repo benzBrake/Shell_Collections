@@ -1,0 +1,24 @@
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+key = ngx_google_deployment.key
+prompt = no
+encrypt_key = no
+
+[ req_distinguished_name ]
+countryName = SL
+stateOrProvinceName = Western
+localityName = Colombo
+organizationalUnitName = ABC
+1.commonName = g.doufu.ru
+2.commonName = x.doufu.ru
+
+[ v3_req ]
+# Extensions to add to a certificate request
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = g.doufu.ru
+DNS.2 = x.doufu.ru

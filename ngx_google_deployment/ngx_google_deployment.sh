@@ -11,26 +11,40 @@ rootness
 function slogan {
 clear
 echo -n "#========================================================================
-#                   ngx_google_deployment_mod_C Install Shell
-# Version :         0.1 beta2
-# Script author :   Charisma<github-charisma@32mb.cn>
+#               ngx_google_deployment_mod_C Install Shell
+# Version :         0.2
+# Script author :   benzBrake<github-benzBrake@woai.ru>
 # Blog :            http://blog.iplayloli.com
 # System Required : Centos/Debian/Ubuntu
-# Project url :https://github.com/Shell_Collections/ngx_google_deployment
+# Project url :     https://github.com/Shell_Collections/ngx_google_deployment
 # Thanks To :       arnofeng<http://github.com/arnofeng>
-#========================================================================"
+#========================================================================
+"
 }
 function install {
-	kill80
+#	读取配置
 	if [ -f "$HOME/nginx_onekey_config" ]; then
 		source "$HOME/nginx_onekey_config"
 	else
 		configure
 	fi
-#	Install nginx
-	wget -N --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/Nginx_OneKey/onekey.sh
-	bash onekey.sh install
-#	Download nginx config file
+
+#	清除80端口占用
+	kill80
+
+#	下载 Nginx 模块
+	mkdir -p ${NO_MODULES} && cd ${NO_MODULES}
+	wget -N --no-check-certificate https://github.com/benzBrake/Shell_Collections/raw/master/Nginx_OneKey/modules/ngx_http_substitutions_filter_module.tgz
+	tar -xzvf ngx_http_substitutions_filter_module.tgz
+	rm -rf ngx_http_substitutions_filter_module.tgz
+	cd ${NO_TEMP}
+
+#	安装 Nginx
+	bash -c "$(wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/Nginx_OneKey/onekey.sh -O -)" -c "install"
+#	停止 Nginx
+	service nginx stop
+
+#	下载 Nginx 配置文件
 	source "$HOME/nginx_onekey_config"
 	cd "$NO_PATH"
 	test -d "$NO_PATH/conf" || mkdir "$NO_PATH/conf"
@@ -38,28 +52,23 @@ function install {
 	if [ -f "./nginx.conf" ]; then
 		mv nginx.conf nginx.conf.bak
 	fi
-	wget -N --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/ngx_google_deployment/nginx.conf
+	wget -N --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/ngx_google_deployment/nginx.conf
 	sed -i "s/g.doufu.ru/$NO_SEARCH/" nginx.conf
 	sed -i "s/x.doufu.ru/$NO_SCHOLAR/" nginx.conf
 	test -d "$NO_PATH/conf/vhost" || mkdir "$NO_PATH/conf/vhost"
-#	mkdir /var/www/
+
+#	创建 /var/www/
 	test -d /var/www/google || mkdir -p /var/www/google
 	cd /var/www/google
-	wget -N --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/ngx_google_deployment/index.html
+	wget -N --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/ngx_google_deployment/index.html
 	sed -i "s/g.doufu.ru/$NO_SEARCH/" /var/www/google/index.html
 	sed -i "s/x.doufu.ru/$NO_SCHOLAR/" /var/www/google/index.html
-#	SSL Key
+
+#	自签 SSL 证书
 	sslcert
-#	start nginx
-	"$NO_PATH/sbin/nginx"
-	if [ $? -eq 0 ]; then
-		echo "# Everything seems OK!"
-		echo "# Go ahead to see your google!"
-		echo "# !!!Do not modify nginx.conf!!!"
-	else
-		echo "# Installing errors!"
-		echo "# Reinstall OR Contact me!"
-	fi
+
+#	启动 Nginx
+	service nginx start
 }
 function configure {
 	if [ ! -f "$HOME/nginx_onekey_config" ]; then
@@ -79,23 +88,13 @@ function configure {
 	fi
 }
 function question {
-	echo -n "Select which you want:
-	1.Install for Debian/Ubuntu
-	2.Install for Centos
-Your choice:"
-	read -r syst
-	case "$syst" in
-	1)
-		NO_SYST=Debian
-		;;
-	2)
+	if [ -n "$(command -v yum)" ]; then
 		NO_SYST=Centos
-		;;
-	*)
-		echo '# Error option, quit!'
+	elif [ -n "$(command -v apt-get)" ]; then
+		NO_SYST=Debian
+	else
 		exit 1
-		;;
-	esac
+	fi
 	if [ "$NO_SYST" = "Debian" ]; then
 		echo -n "To be sure your system is Debian/Ubuntu,please enter 'y/yes' to continue: "
 	elif [ "$NO_SYST" = "Centos" ]; then
@@ -131,15 +130,17 @@ NO_LOGP=/var/log/nginx
 EOF
 }
 function update {
-#2.Kill:80
+
+#   Kill:80
 	kill80
-#2.Configure
+
+#   Configure
 	source "$HOME/nginx_onekey_config"
 	read -p "Do you need to change your domain for google and schoolar?(y/N):" change
 	if [ "$change" = "y" ] || [ "$change" = "Y" ]; then
 		read -p "Set your domain for google search: " domain1
 		read -p "Set your domain for google scholar: " domain2
-		if [ ! $domain ]||[ ! $domain2 ]||[ $domain1 = $domain2 ]; then
+		if [ ! $domain1 ]||[ ! $domain2 ]||[ $domain1 = $domain2 ]; then
 			echo "Two domains should not be null OR the same! Error happens!"
 			exit 1
 		else
@@ -162,66 +163,76 @@ NO_PATH=$NO_PATH
 NO_CONF=$NO_CONF
 NO_LOGP=$NO_LOGP
 EOF
-		install
-		cd "$NO_PATH/conf/"
-		mv -f nginx.conf nginx.conf.bak
-		wget -N --no-check-certificate https://raw.githubusercontent.com/Char1sma/Shell_Collections/master/ngx_google_deployment/nginx.conf
-		sed -i "s/g.doufu.ru/$NO_SEARCH/" nginx.conf
-		sed -i "s/x.doufu.ru/$NO_SCHOLAR/" nginx.conf
-		sslcrt;
+	sslcert
+	service nginx restart
 	else
-		$NO_PATH/sbin/nginx
-		if [ $? -eq 0 ]; then
-			echo "# Everything seems OK!"
-			echo "# Go ahead to see your google!"
-			echo "# !!!Do not modify nginx.conf!!!"
-		else
-			echo "#Installing errors!"
-			echo "#Reinstall OR Contact me!"
-		fi
+		exit 1
 	fi
 }
 function kill80 {
-	yum update || apt-get update
-	yum install lsof -y|| apt-get install lsof -y
+	if [ -n "$(command -v yum)" ]; then
+		yum update -y
+		yum install lsof -y
+	elif [ -n "$(command -v systemctl)" ]; then
+		apt-get update -y
+		apt-get install lsof -y
+	fi
 	lsof -i :80|grep -v 'PID'|awk '{print $2}'|xargs kill -9
 	if [ $? -eq 0 ]; then
-        echo ":80 process has been killed!"
+		echo ":80 process has been killed!"
 	else
 		echo "no :80 process!"
-    fi
+	fi
 }
 function sslcert {
+#	自签SSL证书
 	source "$HOME/nginx_onekey_config"
+	rm -rf /var/www/ssls
 	mkdir -p /var/www/ssls
 	cd /var/www/ssls
-	openssl req -nodes -newkey rsa:2048 -keyout $NO_SEARCH.key -out $NO_SEARCH.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$NO_SEARCH"
-	openssl x509 -req -days 3650 -in $NO_SEARCH.csr -signkey $NO_SEARCH.key -out $NO_SEARCH.crt
-	openssl req -nodes -newkey rsa:2048 -keyout $NO_SCHOLAR.key -out $NO_SCHOLAR.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=$NO_SCHOLAR"
-	openssl x509 -req -days 3650 -in $NO_SCHOLAR.csr -signkey $NO_SCHOLAR.key -out $NO_SCHOLAR.crt
+	wget https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/ngx_google_deployment/openssl.cnf -O openssl.cnf
+	sed -i "s/g.doufu.ru/$NO_SEARCH/" openssl.cnf
+	sed -i "s/x.doufu.ru/$NO_SCHOLAR/" openssl.cnf
+	openssl genrsa -out ngx_google_deployment.key 2048
+	openssl req -new -key ngx_google_deployment.key -out ngx_google_deployment.csr -config openssl.cnf
+	openssl x509 -req -days 3650 -in ngx_google_deployment.csr -signkey ngx_google_deployment.key -out ngx_google_deployment.crt
 }
 function clean {
 	source "$HOME/nginx_onekey_config"
 	rm -rf "$NO_TEMP"
 	rm -rf "$NO_PATH"
 	rm -rf "$NO_LOGP"
+	rm -rf "$NO_MODULES"
 	rm -f "$HOME/nginx_onekey_config"
 	rm -rf /var/www/google
 	rm "/var/www/ssls/$NO_SEARCH.*" -rf
 	rm "/var/www/ssls/$NO_SCHOLAR.*" -rf
 	echo "# All has been done!"
 }
+function uninstall_Service {
+#   Install nginx auto startup service.
+	if [ -n "$(command -v systemctl)" ]; then
+		systemctl stop nginx.service
+		systemctl disable nginx.service
+		rm -rf /lib/systemd/system/nginx.service
+		systemctl daemon-reload
+		systemctl reset-failed
+	elif [ -n "$(command -v apt-get)" ]; then
+		service nginx stop
+		update-rc.d nginx remove
+		rm -rf /etc/init.d/nginx
+	elif [ -n "$(command -v yum)" ]; then
+		service nginx stop
+		chkconfig nginx disable
+		rm -rf /etc/init.d/nginx
+	fi
+}
 function uninstall {
 	source "$HOME/nginx_onekey_config"
 	read -p "Press any key to start uninstall or CTRL + C to exit..."
-	"$NO_PATH/sbin/nginx -s stop"
-	# restore /etc/rc.local
-    if [[ -s /etc/rc.local_bak ]]; then
-        rm -f /etc/rc.local
-        mv /etc/rc.local_bak /etc/rc.local
-    fi
+	uninstall_Service
 	clean
-	echo "# Ngx_google_deployment uninstall success!"
+	echo "# Ngx_google_deployment uninstall successful!"
 }
 slogan
 case $1 in
@@ -229,23 +240,27 @@ case $1 in
 		echo "Usage: $0 [OPTION]"
 		echo ""
 		echo "Here are the options:"
-		echo "install       install ngx_google_deployment"
-		echo "uninstall     uninstall ngx_google_deployment"
-		echo "update        update nginx.conf";;
+		echo "install	   install ngx_google_deployment"
+		echo "uninstall	 uninstall ngx_google_deployment"
+		echo "update		update nginx.conf"
+		;;
 	update)
 		if [ -f "$HOME/nginx_onekey_config" ]; then
 			update
 		else
 			echo "It seem that you don't have installed ngx_google_deployment"
-			exit 1;
-		fi;;
+			exit 1
+		fi
+		;;
 	install)
-		install;;
+		install
+		;;
 	uninstall)
 		uninstall
 		;;
 	*)
 		echo "$0 : invalid option -- '$1'"
 		echo "Try '$0 help' for more infomation."
-		exit 0;;
+		exit 0
+		;;
 esac
