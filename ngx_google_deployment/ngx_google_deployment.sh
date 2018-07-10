@@ -27,6 +27,7 @@ function install {
 		source "$HOME/nginx_onekey_config"
 	else
 		configure
+		source "$HOME/nginx_onekey_config"
 	fi
 
 #	清除80端口占用
