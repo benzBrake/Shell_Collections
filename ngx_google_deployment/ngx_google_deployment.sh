@@ -33,7 +33,8 @@ function install {
 	kill80
 
 #	下载 Nginx 模块
-	mkdir -p ${NO_MODULES} && cd ${NO_MODULES}
+	mkdir -p ${NO_MODULES}
+	cd ${NO_MODULES}
 	wget -N --no-check-certificate https://github.com/benzBrake/Shell_Collections/raw/master/Nginx_OneKey/modules/ngx_http_substitutions_filter_module.tgz
 	tar -xzvf ngx_http_substitutions_filter_module.tgz
 	rm -rf ngx_http_substitutions_filter_module.tgz
