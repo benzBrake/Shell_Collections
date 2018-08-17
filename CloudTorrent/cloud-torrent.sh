@@ -6,7 +6,7 @@ OS_VERSION=$(grep -oEh "[0-9]+" /etc/*-release | head -n 1) || {
 		EOF
 		exit 1
 	}
-INSTALL_ROOT=/usr/local/cloudtorrent
+INSTALL_ROOT=/usr/local/cloud-torrent
 help_info() {
 	echo "Usage: $(basename $0) [OPTION[=PATTERN]]"
 	echo "Cloud Torrent installer"
@@ -104,6 +104,7 @@ if test -z "$ERROR"; then
 			fi
 			source prepare.sh
 			prepare
+			rm -rf prepare.sh
 			! test -d "${INSTALL_ROOT}" && mkdir -p "${INSTALL_ROOT}"
 			cd "${INSTALL_ROOT}"
 			CT_VER=$( curl -s "https://github.com/jpillora/cloud-torrent/releases/latest" | perl -e 'while($_=<>){ /\/tag\/(.*)\">redirected/; print $1;}' )
@@ -127,28 +128,28 @@ if test -z "$ERROR"; then
 			fi
 			chmod +x cloud-torrent
 			if [ -n "$(command -v apt-get)" ]; then
-				if ! wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/CloudTorrent/cloudtorrent-debian -O /etc/init.d/cloudtorrent; then
-					echo "Failed to download CloudTorrent chkconfig file!"
+				if ! wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/CloudTorrent/cloud-torrent-debian -O /etc/init.d/cloud-torrent; then
+					echo "Failed to download cloud-torrent chkconfig file!"
 					exit 1
 				fi
-				chmod +x /etc/init.d/cloudtorrent
-				update-rc.d -f cloudtorrent defaults
+				chmod +x /etc/init.d/cloud-torrent
+				update-rc.d -f cloud-torrent defaults
 			elif [ -n "$(command -v yum)" ]; then
-				if ! https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/CloudTorrent/cloudtorrent -O /etc/init.d/cloudtorrent; then
-					echo "Failed to download CloudTorrent chkconfig file!"
+				if ! wget --no-check-certificate https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/CloudTorrent/cloud-torrent -O /etc/init.d/cloud-torrent; then
+					echo "Failed to download cloud-torrent chkconfig file!"
 					exit 1
 				fi
-				chmod +x /etc/init.d/cloudtorrent
-				chkconfig --add cloudtorrent
-				chkconfig cloudtorrent on
+				chmod +x /etc/init.d/cloud-torrent
+				chkconfig --add cloud-torrent
+				chkconfig cloud-torrent on
 			fi
-			test -e /usr/local/cloudtorrent/cloudtorrent.conf && rm -f /usr/local/cloudtorrent/cloudtorrent.conf
-			cat >> /usr/local/cloudtorrent/cloudtorrent.conf <<-EOF
+			test -e /usr/local/cloud-torrent/cloud-torrent.conf && rm -f /usr/local/cloud-torrent/cloud-torrent.conf
+			cat >> /usr/local/cloud-torrent/cloud-torrent.conf <<-EOF
 			CT_USER=$CT_USER
 			CT_PASS=$CT_PASS
 			CT_PORT=$CT_PORT
 			EOF
-			/etc/init.d/cloudtorrent start
+			/etc/init.d/cloud-torrent start
 			sleep 2s
 			PID=$( ps -ef | grep cloud-torrent | grep -v grep | awk '{print $2}' )
 			if [ -z $PID ]; then
@@ -173,7 +174,7 @@ if test -z "$ERROR"; then
 		! test -z "$PID" && {
 			kill -9 "$PID"
 		}
-		rm -f /etc/init.d/cloudtorrent
+		rm -f /etc/init.d/cloud-torrent
 		rm -rf "${INSTALL_ROOT}"
 		echo "[INFO] Uninstall Cloud Torrent successful!"
 		exit 0

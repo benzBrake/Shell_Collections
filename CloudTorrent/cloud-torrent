@@ -15,9 +15,9 @@
 # Author: benzBrake <github-benzBrake@woai.ru>
 
 NAME=CloudTorrent
-BIN=/usr/local/cloudtorrent/cloud-torrent
-CONFIG=/usr/local/cloudtorrent/cloudtorrent.conf
-LOGFILE=/var/log/cloudtorrent.log
+BIN=/usr/local/cloud-torrent/cloud-torrent
+CONFIG=/usr/local/cloud-torrent/cloud-torrent.conf
+LOGFILE=/var/log/cloud-torrent.log
 RETVAL=0
 source $CONFIG
 check_running(){
