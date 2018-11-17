@@ -31,6 +31,13 @@ Fix apt-get update 404 on debian squeeze
 bash -c "$(wget https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/debian_squeeze_apt_sources.sh -O -)"
 ```
 
+## jotta_cli.sh
+Install Jotta-cli tools automatic
+一键安装 Jotta-cli
+```shell
+bash -c "$(wget https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/jotta_cli.sh -O -)"
+```
+
 ## gdrive_cli.sh
 Install prasmussen/gdrive automatic
 一键安装 gdrive-cli
