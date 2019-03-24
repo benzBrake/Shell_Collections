@@ -39,6 +39,10 @@ if [ ! -z $(command -v systemctl) ]; then
     systemctl enable jottad
 else
     service jottad start
-    chkconfig jottad on
+    if [ ! -z $(command -v chkconfig) ]; then
+        chkconfig jottad on
+    else
+        updaterc.d jottad defaults
+    fi
 fi
 echo "JottaCLI install complete!"
