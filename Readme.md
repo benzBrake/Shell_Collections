@@ -46,6 +46,58 @@ bash -c "$(wget https://raw.githubusercontent.com/benzBrake/Shell_Collections/ma
 ```
 ## iptables_rules.sh
 Useful iptables rules (not work on CentOS 7/RHEL 7)
-```
+```shell
 bash -c "$(wget https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/iptables_rules.sh -O -)"
 ```
+
+## rclone-mount.sh
+
+RCLONE 辅助挂载脚本
+
+先安装 fuse和fuse3
+
+```shell
+apt update
+apt install fuse fuse3
+```
+
+然后下载此脚本，比如下载到`/data/rclone`下，然后修改脚本
+
+```shell
+#--Config Start
+BIN="/usr/bin/rclone"  # rclone 路径
+CONFIG="/data/rclone/rclone.conf" # rclone 配置文件
+LOG_PATH="/var/log/rcloned.log" # rclone 日志路径
+MOUNT_LIST="/data/rclone/mount.conf" # 挂载列表
+#--Config End
+```
+
+`mount.conf`格式如下
+
+```
+配置名:=挂载路径
+```
+
+比如我的配置如下
+
+```shell
+# rclone config
+Current remotes:
+
+Name                 Type
+====                 ====
+dy001                onedrive
+```
+
+我要挂载 **dy001** 到 **/mnt/dy**，则`mount.conf`的格式如下
+
+```
+dy001:=/mnt/dy
+```
+
+然后运行脚本即可
+
+```shell
+sh rclone-mount.sh
+```
+
