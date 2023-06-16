@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 #--Config Start
 BIN="/usr/bin/rclone"
@@ -27,11 +27,11 @@ start)
     else
       echo "Starting $REMOTE--->$MOUNT..."
       mkdir -p $MOUNT
-      nohup rclone mount $REMOTE $MOUNT --config $CONFIG --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 >$LOG_PATH 2>&1 &
+      nohup rclone mount $REMOTE $MOUNT --config $CONFIG --copy-links --no-gzip-encoding --no-check-certificate --allow-other --allow-non-empty --umask 000 --dir-cache-time 5m --vfs-cache-mode writes --buffer-size 100M --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 4G --no-modtime >$LOG_PATH 2>&1 &
       sleep 3
       PID="$(get_pid $MOUNT)"
       [ -n "$PID" ] && {
-        echo -ne "$REMOTE--->$MOUNT mount success!"
+        echo "$REMOTE--->$MOUNT mount success!"
       } || {
         echo "$REMOTE--->$MOUNT mount failed!"
       }
@@ -45,6 +45,7 @@ stop)
     PID="$(get_pid $MOUNT)"
     [ -z "$PID" ] && echo "$REMOTE--->$MOUNT is not mount."
     [ -n "$PID" ] && kill -9 $PID >/dev/null 2>&1
+    [ -n "$PID" ] && umount $MOUNT
     [ -n "$PID" ] && echo "$REMOTE--->$MOUNT is unmounted."
   done
   ;;
