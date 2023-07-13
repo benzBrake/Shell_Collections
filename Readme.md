@@ -3,7 +3,7 @@
 
 :warning::  目前有问题，待更新
 
-# CloudTorrent
+## CloudTorrent
 
 安装 CloudTorrent BT 离线下载工具
 
@@ -18,6 +18,7 @@ Nginx 一键安装脚本，不包含PHP MYSQL SQLITE
 Google 反代一键安装脚本，基于 Nginx_Onekey
 
 ## RyLLMP
+
 lighttpd+mysql+sqlite+php 一键安装脚本
 二进制安装，速度快
 
@@ -101,3 +102,10 @@ dy001:=/mnt/dy
 sh rclone-mount.sh
 ```
 
+## tcping.sh
+
+一键安装支持 ipv4/ipv6 双栈的 tcping
+
+```bash
+curl -sSL https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/tcping.sh | sh
+```
