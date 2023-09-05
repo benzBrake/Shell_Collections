@@ -125,3 +125,9 @@ sh rclone-mount.sh start
 ```bash
 curl -sSL https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/tcping.sh | sh
 ```
+
+## openwrt-install-clouddrive2.sh
+
+openwrt 环境一键安装 clouddrive2
+
+curl -sSL https://raw.githubusercontent.com/benzBrake/Shell_Collections/master/openwrt-install-clouddrive2.sh | bash
